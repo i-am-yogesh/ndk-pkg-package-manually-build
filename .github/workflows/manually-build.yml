@@ -127,8 +127,14 @@ jobs:
       - run: ./ndk-pkg update
       - run: ./ndk-pkg install android-${{ github.event.inputs.target-api }}-${{ github.event.inputs.target-abis }}/${{ github.event.inputs.package-name }} --profile=${{ github.event.inputs.profile }} ${{ needs.base.outputs.install-args }}
 
-      - run: ndk-pkg self update || echo "update failed, continuing..."
-      - run: ndk-pkg --version
+      - name: Install ndk-pkg manually
+        run: |
+          set -ex
+          apt-get update
+          apt-get install -y curl jq git python3 python3-pip
+          curl -fsSL https://github.com/fpliu/ndk-pkg/releases/latest/download/ndk-pkg-linux -o /usr/local/bin/ndk-pkg
+          chmod +x /usr/local/bin/ndk-pkg
+          ndk-pkg --version
 
       - name: pack
         run: |
